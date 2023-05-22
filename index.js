@@ -48,12 +48,21 @@ async function run() {
       const user = req.body;
       console.log(user);
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h'});
-      console.log(token)
+      // console.log(token)
       res.send({token});
     })
 
     app.get('/services', async(req, res) => {
-        const cursor = serviceCollection.find();
+      const asc = req.query.sort;
+      // const query = {};
+      const query = { price: {$gt: 50, $lte:150}}
+      const options = {
+        // sort matched documents in descending order by rating
+        sort: {
+          "price" : sort === 'asc' ? 1 : -1
+        }
+      }
+        const cursor = serviceCollection.find(query, options);
         const result = await cursor.toArray();
         res.send(result);
     })
